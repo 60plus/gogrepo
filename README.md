@@ -32,6 +32,15 @@ A lightweight Flask-based web UI around gogrepo to log in, update your manifest,
 - Helpful hover tooltips on toggles:
   - `skipknown`, `updateonly`, `skipextras`, `skipgames` show what each option does.  
 
+## Roadmap 🗺️
+
+- 2FA improvements:
+  - Current status: works with authenticator app codes and accounts without 2FA.
+  - Goal: add support for email-based security codes.
+- Multi-select downloads:
+  - Select several games at once (not just one or all).
+- Multi-account sessions:
+  - Log into multiple GOG accounts and download without duplicates across libraries.
 
 
 ---
