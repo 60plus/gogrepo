@@ -48,8 +48,8 @@
           <div class="update-grid">
             <form onsubmit="return launchUpdate(this)" class="update-form">
               <div class="opts-line">
-                <label><input type="checkbox" name="skipknown"> skipknown</label>
-                <label><input type="checkbox" name="updateonly"> updateonly</label>
+                <label title="Only update new games in your library."><input type="checkbox" name="skipknown"> skipknown</label>
+                <label title="Only update games with the updated tag in your library."><input type="checkbox" name="updateonly"> updateonly</label>
               </div>
               <div class="opts-line">
                 <span>OS:</span>
@@ -87,8 +87,8 @@
           <textarea id="gameDesc" class="desc" placeholder="Opis gry pojawi się tutaj po wybraniu gry z listy." readonly></textarea>
 
           <div class="dl-opts">
-            <label><input type="checkbox" id="skipextras"> skipextras</label>
-            <label><input type="checkbox" id="skipgames"> skipgames</label>
+            <label title="Skip downloading of any GOG extra files (Manuals,etc..)"><input type="checkbox" id="skipextras"> skipextras</label>
+            <label title="Download extras only."><input type="checkbox" id="skipgames"> skipgames</label>
           </div>
 
           <div class="dl-actions">
@@ -214,7 +214,7 @@
         .then(r=>r.json()).then(_=>{ /* status odbierze poller */ });
     }
 
-    // Naprawa: pobieranie i pokazanie okładki + opisu
+    // Pobieranie i pokazanie okładki + opisu
     function fetchInfoForSelected(){
       const sel = document.getElementById('gameSelect');
       if(!sel || sel.selectedIndex < 0) return;
