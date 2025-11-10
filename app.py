@@ -126,8 +126,8 @@ def _extract_games_from_obj(data):
     for g in source:
         if not isinstance(g, dict):
             continue
-        slug = (g.get("title") or g.get("slug") or "").strip()            # do -id
-        nice = (g.get("long_title") or slug).strip()                      # label
+        slug = (g.get("title") or g.get("slug") or "").trim() if hasattr(str, "trim") else (g.get("title") or g.get("slug") or "").strip()
+        nice = (g.get("long_title") or slug).strip()
         pid  = g.get("product_id") or g.get("productId") or g.get("productid") or g.get("id")
         if slug and slug.lower() not in seen:
             seen.add(slug.lower())
@@ -163,7 +163,50 @@ def _abs_url(u: str) -> str:
     u = u.strip()
     if u.startswith("//"):
         return "https:" + u
+    if u.startswith("/"):
+        return "https://www.gog.com" + u
+    if not u.lower().startswith("http"):
+        return "https://" + u
     return u
+
+def _pick_from_dict(d: dict, keys: list[str]) -> str:
+    for k in keys:
+        v = d.get(k)
+        if v:
+            return v
+    return ""
+
+def _extract_url_from_value(v) -> str:
+    if isinstance(v, str):
+        return v
+    if isinstance(v, dict):
+        return _pick_from_dict(v, ["image_url", "url", "href", "src", "original"]) or ""
+    return ""
+
+def _get_image_from_images(images) -> str:
+    # images may be dict with many keys, or list of dicts/strings
+    if isinstance(images, dict):
+        # preference order
+        for key in ["vertical", "boxArtImage", "box_art_image", "logo", "background", "square", "tileImage", "tile_image", "cover", "image"]:
+            if key in images:
+                url = _extract_url_from_value(images.get(key))
+                if url:
+                    return url
+        # direct URL fields at top-level
+        url = _pick_from_dict(images, ["image_url", "url", "href", "src", "original"])
+        if url:
+            return url
+        # scan nested dicts
+        for v in images.values():
+            url = _extract_url_from_value(v)
+            if url:
+                return url
+    elif isinstance(images, list):
+        for item in images:
+            url = _extract_url_from_value(item)
+            if url:
+                return url
+    return ""
 
 def _find_game_raw_by_title(slug: str):
     data = _load_manifest_raw()
@@ -358,9 +401,7 @@ def game_info():
             data = fetch_product_details(pid)
             desc = (data.get("description", {}) or {}).get("full") or ""
             images = data.get("images", {}) or {}
-            cover = images.get("vertical") or images.get("logo") or images.get("background") or ""
-            if isinstance(cover, dict):
-                cover = cover.get("image_url") or ""
+            cover = _get_image_from_images(images) or _extract_url_from_value(data.get("image"))
             info["description_html"] = desc or info["description_html"]
             info["cover_url"] = _abs_url(cover) or info["cover_url"]
         except Exception:
@@ -368,7 +409,8 @@ def game_info():
     if not info["cover_url"] and title:
         g = _find_game_raw_by_title(title)
         if isinstance(g, dict):
-            cover = g.get("bg_url") or g.get("image") or ""
+            cover = g.get("bg_url") or g.get("image") or g.get("logo") or ""
+            cover = _extract_url_from_value(cover)
             info["cover_url"] = _abs_url(cover) or info["cover_url"]
     return jsonify(info)
 
