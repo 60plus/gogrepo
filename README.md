@@ -1,3 +1,68 @@
+# GOGrepo GUI ✨
+
+<p align="center">
+  <img src="static/logo.png" alt="GOGrepo GUI Logo" width="420">
+</p>
+
+A lightweight Flask-based web UI around gogrepo to log in, update your manifest, and download your GOG library with real-time logs, progress, and inline game info. Designed to be compact, modern, and easy to deploy. 🚀
+
+---
+
+## Screenshots 📸
+
+![Home](static/sc1.png)
+![Download](static/sc2.png)
+![Details](static/sc3.png)
+
+> Place your `.png` screenshots in `static/` with the exact filenames above.
+
+---
+
+## Features ✅
+
+- Two-step login flow integrated with `gogrepo` (OTP/2FA supported when prompted).  
+- Update manifest with OS and language filters, plus:
+  - `skipknown` — Only update new games in your library.  
+  - `updateonly` — Only update games with the updated tag in your library.  
+- Download options:
+  - Download all titles, or a single selected game from your library.  
+  - Real-time output panel with progress estimation and a Cancel button.  
+- Inline game details:
+  - Description and cover fetched from GOG API with manifest fallback for robustness.  
+- Helpful hover tooltips on toggles:
+  - `skipknown`, `updateonly`, `skipextras`, `skipgames` show what each option does.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <details>
 <summary>OLD INFO</summary>
 gogrepo
