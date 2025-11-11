@@ -28,7 +28,9 @@ A lightweight Flask-based web UI around gogrepo to log in, update your manifest,
   - Download all titles, or a single selected game from your library.  
   - Real-time output panel with progress estimation and a Cancel button.  
 - Inline game details:
-  - Description and cover fetched from GOG API with manifest fallback for robustness.  
+  - Description and cover fetched from GOG API with manifest fallback for robustness.
+- Disk cache for descriptions and covers 
+  - Stores JSON in Cache/desc and images in Cache/cover to reduce external API calls; cached covers are served locally for faster details panel.
 - Helpful hover tooltips on toggles:
   - `skipknown`, `updateonly`, `skipextras`, `skipgames` show what each option does.  
 
