@@ -1,260 +1,369 @@
-<!doctype html>
-<html lang="pl">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <title>GOGrepo GUI</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GOGrepo Downloader</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-  <div class="wrap">
-
-    <section class="grid">
-      <div class="card">
-        <div class="card-head">
-          <span class="status-dot {{ 'ok' if status.cookies else 'no' }}"></span>
-          LOGGED IN
+    <div class="main-container">
+        <!-- LEFT SIDEBAR: Game Library -->
+        <div class="left-sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-gamepad"></i>
+                GAME LIBRARY
+            </div>
+            <div class="game-list" id="gameList">
+                {% for game in games %}
+                <div class="game-item" 
+                     data-title="{{ game.title }}" 
+                     data-product-id="{{ game.product_id or '' }}">
+                    {{ game.long_title }}
+                </div>
+                {% endfor %}
+            </div>
         </div>
-        <div class="card-body">
-          <form method="post" action="/login" class="login-form">
-            <div class="rows">
-              <label>USER</label>
-              <input type="text" name="username" required>
+
+        <!-- CENTER CONTENT: Game Details -->
+        <div class="center-content">
+            <div class="game-details">
+                <div class="no-selection" id="noSelection">
+                    <i class="fas fa-mouse-pointer"></i>
+                    Select a game from the library
+                </div>
+                
+                <div class="game-info" id="gameInfo" style="display:none;">
+                    <img id="gameCover" class="game-cover" src="" alt="Game Cover">
+                    <h1 class="game-title" id="gameTitle">Game Title</h1>
+                    
+                    <div class="meta-grid">
+                        <div class="meta-item" id="gameRating">
+                            <i class="fas fa-star"></i>
+                            <span>N/A</span>
+                        </div>
+                        <div class="meta-item" id="gameReleaseDate">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>N/A</span>
+                        </div>
+                    </div>
+
+                    <div class="info-section">
+                        <h3><i class="fas fa-building"></i> Developer & Publisher</h3>
+                        <p><strong>Developer:</strong> <span id="gameDeveloper">N/A</span></p>
+                        <p><strong>Publisher:</strong> <span id="gamePublisher">N/A</span></p>
+                    </div>
+
+                    <div class="info-section">
+                        <h3><i class="fas fa-language"></i> Languages</h3>
+                        <div class="lang-grid">
+                            <div><strong>Audio:</strong> <span id="langAudio">N/A</span></div>
+                            <div><strong>Text:</strong> <span id="langText">N/A</span></div>
+                            <div><strong>Subtitles:</strong> <span id="langSubtitles">N/A</span></div>
+                        </div>
+                    </div>
+
+                    <div class="info-section">
+                        <h3><i class="fas fa-laptop"></i> System Requirements</h3>
+                        <div class="os-icons">
+                            <i class="fab fa-windows os-icon" id="osWindows"></i>
+                            <i class="fab fa-linux os-icon" id="osLinux"></i>
+                            <i class="fab fa-apple os-icon" id="osMac"></i>
+                        </div>
+                    </div>
+
+                    <div class="info-section">
+                        <h3><i class="fas fa-align-left"></i> Description</h3>
+                        <div class="game-description" id="gameDescription">
+                            <p>No description available.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="rows">
-              <label>PASSWORD</label>
-              <input type="password" name="password" required>
-            </div>
-            {% if status.need_2fa %}
-            <div class="rows">
-              <label>2FA CODE</label>
-              <input type="text" name="otp" placeholder="Code from email/app" autofocus required>
-              <input type="hidden" name="login_token" value="{{ status.login_token or '' }}">
-            </div>
-            {% else %}
-            <div class="rows">
-              <label>2FA CODE</label>
-              <input type="text" name="otp" placeholder="If already received">
-            </div>
-            {% endif %}
-            <button type="submit" class="btn primary">LOGIN</button>
-          </form>
         </div>
-      </div>
 
-      <div class="card">
-        <div class="card-head">UPDATE</div>
-        <div class="card-body">
-          <div class="update-grid">
-            <form onsubmit="return launchUpdate(this)" class="update-form">
-              <div class="opts-line">
-                <label title="Only update new games in your library."><input type="checkbox" name="skipknown"> skipknown</label>
-                <label title="Only update games with the updated tag in your library."><input type="checkbox" name="updateonly"> updateonly</label>
-              </div>
-              <div class="opts-line">
-                <span>OS:</span>
-                <label><input type="checkbox" name="os" value="windows"> win</label>
-                <label><input type="checkbox" name="os" value="linux"> lin</label>
-                <label><input type="checkbox" name="os" value="mac"> mac</label>
-              </div>
-              <div class="opts-line">
-                <span>langs:</span>
-                <input type="text" name="langs" placeholder="en pl de">
-              </div>
-              <button type="submit" class="btn secondary">UPDATE GAME LIST</button>
-            </form>
-            <div class="upd-logo">
-              <img src="{{ url_for('static', filename='logo.png') }}" alt="logo">
+        <!-- RIGHT SIDEBAR: Functions -->
+        <div class="right-sidebar">
+            <!-- Login Card -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="status-dot {% if status.cookies %}ok{% endif %}"></span>
+                    <i class="fas fa-user"></i>
+                    LOGGED IN
+                </div>
+                <div class="card-body">
+                    {% if status.need_2fa %}
+                    <form method="POST" action="{{ url_for('login') }}" class="compact-form">
+                        <input type="hidden" name="login_token" value="{{ status.login_token }}">
+                        <input type="text" name="otp" placeholder="2FA Code (optional)" autocomplete="off">
+                        <button type="submit" class="btn primary">
+                            <i class="fas fa-key"></i> Submit 2FA
+                        </button>
+                    </form>
+                    {% else %}
+                    <form method="POST" action="{{ url_for('login') }}" class="compact-form">
+                        <input type="text" name="username" placeholder="Username" autocomplete="username" required>
+                        <input type="password" name="password" placeholder="Password" autocomplete="current-password" required>
+                        <input type="text" name="otp" placeholder="2FA Code (optional)" autocomplete="off">
+                        <button type="submit" class="btn primary">
+                            <i class="fas fa-sign-in-alt"></i> Login
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
             </div>
-          </div>
+
+            <!-- Update Card -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="status-dot {% if status.manifest %}ok{% endif %}"></span>
+                    <i class="fas fa-sync-alt"></i>
+                    UPDATE
+                </div>
+                <div class="card-body">
+                    <form id="updateForm" class="compact-form">
+                        <div class="checkbox-group">
+                            <label><input type="checkbox" name="os" value="windows" checked> <i class="fab fa-windows"></i></label>
+                            <label><input type="checkbox" name="os" value="linux"> <i class="fab fa-linux"></i></label>
+                            <label><input type="checkbox" name="os" value="mac"> <i class="fab fa-apple"></i></label>
+                        </div>
+                        <input type="text" name="langs" placeholder="Languages: en pl de" value="en pl de">
+                        <div class="checkbox-group">
+                            <label title="Skip known games"><input type="checkbox" name="skipknown"> Skip known</label>
+                            <label title="Update only"><input type="checkbox" name="updateonly"> Update only</label>
+                        </div>
+                        <button type="submit" class="btn primary">
+                            <i class="fas fa-download"></i> Update List
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Download Card -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-cloud-download-alt"></i>
+                    DOWNLOAD
+                </div>
+                <div class="card-body">
+                    <form id="downloadForm" class="compact-form">
+                        <input type="hidden" id="selectedTitle" name="selected_title" value="">
+                        <div class="checkbox-group">
+                            <label title="Skip extras"><input type="checkbox" name="skipextras"> Skip extras</label>
+                            <label title="Skip games"><input type="checkbox" name="skipgames"> Skip games</label>
+                        </div>
+                        <div class="btn-group">
+                            <button type="button" id="downloadSelectedBtn" class="btn primary">
+                                <i class="fas fa-download"></i> Selected
+                            </button>
+                            <button type="button" id="downloadAllBtn" class="btn secondary">
+                                <i class="fas fa-list"></i> All
+                            </button>
+                            <button type="button" id="cancelBtn" class="btn danger" style="display:none;">
+                                <i class="fas fa-times"></i> Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Output/Log Card -->
+            <div class="card log-card">
+                <div class="card-header">
+                    <i class="fas fa-terminal"></i>
+                    OUTPUT / LOG
+                </div>
+                <div class="card-body">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                        <div class="progress-text" id="progressText">0%</div>
+                    </div>
+                    <div class="log-output" id="logOutput">Ready...</div>
+                </div>
+            </div>
         </div>
-      </div>
-    </section>
+    </div>
 
-    <section class="card wide">
-      <div class="card-head">DOWNLOAD</div>
-      <div class="card-body">
-        <form class="download-form" onsubmit="return false;">
-          <div class="dl-row">
-            <select id="gameSelect" class="select">
-              {% for g in games %}
-                <option value="{{ g.title }}" data-pid="{{ g.product_id or '' }}">{{ g.long_title or g.title }}</option>
-              {% endfor %}
-            </select>
-            <img id="gameCover" class="cover" alt="cover" />
-          </div>
+    <script>
+        let currentJobId = null;
+        let selectedGameTitle = null;
 
-          <textarea id="gameDesc" class="desc" placeholder="Opis gry pojawi się tutaj po wybraniu gry z listy." readonly></textarea>
-
-          <div class="dl-opts">
-            <label title="Skip downloading of any GOG extra files (Manuals,etc..)"><input type="checkbox" id="skipextras"> skipextras</label>
-            <label title="Download extras only."><input type="checkbox" id="skipgames"> skipgames</label>
-          </div>
-
-          <div class="dl-actions">
-            <button type="button" class="btn primary" onclick="downloadAll()">DOWNLOAD ALL</button>
-            <button type="button" class="btn primary" onclick="downloadSelected()">DOWNLOAD SELECTED</button>
-            <button type="button" class="btn danger" id="cancelBtn" onclick="cancelCurrent()" disabled>CANCEL</button>
-          </div>
-        </form>
-      </div>
-    </section>
-
-    <section class="card wide">
-      <div class="card-head">OUTPUT / LOG</div>
-      <div class="card-body">
-        <div class="progress">
-          <div id="bar" class="bar" style="width:0%"></div>
-          <span id="prog">0%</span>
-        </div>
-        <pre class="log" id="log">NO output...</pre>
-      </div>
-    </section>
-
-  </div>
-
-  <script>
-    let currentJobId = null;
-
-    function setLog(t){ const el=document.getElementById('log'); el.textContent=t||''; el.scrollTop=1e6; }
-    function setProg(p){
-      const val = Math.max(0, Math.min(100, p|0));
-      document.getElementById('prog').textContent = val + '%';
-      document.getElementById('bar').style.width = val + '%';
-    }
-    function setCancelEnabled(on){
-      const b=document.getElementById('cancelBtn');
-      if(on){ b.removeAttribute('disabled'); } else { b.setAttribute('disabled','disabled'); }
-    }
-
-    // Estymacja realnego progresu na podstawie logu (np. "(48 / 215)" albo "72%")
-    function estimateProgressFromOutput(txt){
-      if(!txt) return null;
-      const matches = [...txt.matchAll(/(?:\(|\[)\s*(\d+)\s*\/\s*(\d+)\s*(?:\)|\])/g)];
-      if(matches.length){
-        const m = matches[matches.length-1];
-        const a = parseInt(m[1],10), b = parseInt(m[2],10);
-        if(b > 0) return Math.max(1, Math.min(99, Math.floor(100*a/b)));
-      }
-      const pm = [...txt.matchAll(/(\d{1,3})%/g)];
-      if(pm.length){
-        const p = parseInt(pm[pm.length-1][1],10);
-        return Math.max(1, Math.min(99, p));
-      }
-      return null;
-    }
-
-    function pollJob(jobid){
-      currentJobId = jobid;
-      setCancelEnabled(true);
-      let fallback = 0;
-      function tick(){
-        fetch('/job_status/'+jobid).then(r=>r.json()).then(j=>{
-          setLog(j.output||'');
-          if(j.status==='running'){
-            const est = estimateProgressFromOutput(j.output||'');
-            if(est !== null) setProg(est); else { fallback = Math.min(95, fallback + 3); setProg(fallback); }
-            setTimeout(tick, 1000);
-          }else{
-            setProg(100);
-            setCancelEnabled(false);
-            currentJobId = null;
-          }
+        // Game selection
+        document.querySelectorAll('.game-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.game-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+                selectedGameTitle = this.getAttribute('data-title');
+                const productId = this.getAttribute('data-product-id');
+                document.getElementById('selectedTitle').value = selectedGameTitle;
+                loadGameInfo(productId, selectedGameTitle);
+            });
         });
-      }
-      setProg(0);
-      tick();
-    }
 
-    // Wznowienie po reloadzie: sprawdź, czy coś działa, i wróć do pollingu
-    function resumeIfRunning(){
-      fetch('/current_job').then(r=>r.json()).then(d=>{
-        if(d && d.job_id && d.status === 'running'){
-          if(d.output) setLog(d.output);
-          pollJob(d.job_id);
+        function loadGameInfo(productId, title) {
+            fetch('/game_info?' + new URLSearchParams({product_id: productId, title: title}))
+                .then(r => r.json())
+                .then(data => displayGameInfo(data))
+                .catch(err => console.error('Error loading game info:', err));
         }
-      });
-    }
 
-    function launchUpdate(form){
-      setProg(0); setLog('Starting update...');
-      fetch('/run_update',{method:'POST',body:new FormData(form)})
-        .then(r=>r.json()).then(d=>pollJob(d.job_id));
-      return false;
-    }
+        function displayGameInfo(info) {
+            document.getElementById('gameInfo').style.display = 'flex';
+            document.getElementById('noSelection').style.display = 'none';
 
-    function buildDLForm(){
-      const fd=new FormData();
-      const sel=document.getElementById('gameSelect');
-      if(sel && sel.selectedIndex>=0) fd.set('selected_title', sel.value);
-      if(document.getElementById('skipextras').checked) fd.set('skipextras','on');
-      if(document.getElementById('skipgames').checked) fd.set('skipgames','on');
-      return fd;
-    }
+            document.getElementById('gameTitle').textContent = info.title || 'Unknown Game';
 
-    function downloadSelected(){
-      setProg(0); setLog('Starting download (selected) ...');
-      fetch('/download_selected',{method:'POST',body:buildDLForm()})
-        .then(r=>r.json()).then(d=>{ if(d.job_id) pollJob(d.job_id); else setLog(d.error||'Error'); });
-    }
+            const coverImg = document.getElementById('gameCover');
+            if (info.cover_url) {
+                coverImg.src = info.cover_url;
+                coverImg.style.display = 'block';
+            } else {
+                coverImg.style.display = 'none';
+            }
 
-    function downloadAll(){
-      setProg(0); setLog('Starting download (all) ...');
-      const fd=new FormData();
-      if(document.getElementById('skipextras').checked) fd.set('skipextras','on');
-      if(document.getElementById('skipgames').checked) fd.set('skipgames','on');
-      fetch('/download_all',{method:'POST',body:fd})
-        .then(r=>r.json()).then(d=>{ if(d.job_id) pollJob(d.job_id); else setLog('Error'); });
-    }
+            // Rating - ROUNDED
+            if (info.rating !== undefined && info.rating !== null) {
+                document.getElementById('gameRating').innerHTML = 
+                    '<i class="fas fa-star"></i><span>' + Math.round(info.rating) + '</span>';
+            } else {
+                document.getElementById('gameRating').innerHTML = 
+                    '<i class="fas fa-star"></i><span>N/A</span>';
+            }
 
-    function cancelCurrent(){
-      const fd=new FormData();
-      if(currentJobId) fd.set('job_id', currentJobId);
-      fetch('/cancel_job',{method:'POST',body:fd})
-        .then(r=>r.json()).then(_=>{ /* status odbierze poller */ });
-    }
+            document.getElementById('gameReleaseDate').innerHTML = 
+                '<i class="fas fa-calendar-alt"></i><span>' + (info.release_date || 'N/A') + '</span>';
 
-    // Pobieranie i pokazanie okładki + opisu
-    function fetchInfoForSelected(){
-      const sel = document.getElementById('gameSelect');
-      if(!sel || sel.selectedIndex < 0) return;
-      const opt   = sel.options[sel.selectedIndex];
-      const pid   = (opt && opt.getAttribute('data-pid')) || '';
-      const title = sel.value || '';
+            document.getElementById('gameDeveloper').textContent = info.developer || 'N/A';
+            document.getElementById('gamePublisher').textContent = info.publisher || 'N/A';
 
-      const params = new URLSearchParams();
-      if(pid) params.set('product_id', pid);
-      if(title) params.set('title', title);
+            const langs = info.languages || {audio: [], text: [], subtitles: []};
+            document.getElementById('langAudio').textContent = langs.audio.length > 0 ? langs.audio.join(', ') : 'N/A';
+            document.getElementById('langText').textContent = langs.text.length > 0 ? langs.text.join(', ') : 'N/A';
+            document.getElementById('langSubtitles').textContent = langs.subtitles.length > 0 ? langs.subtitles.join(', ') : 'N/A';
 
-      fetch('/game_info?' + params.toString())
-        .then(r => r.json())
-        .then(info => {
-          const img  = document.getElementById('gameCover');
-          const desc = document.getElementById('gameDesc');
+            const systems = info.systems || {windows: false, linux: false, mac: false};
+            document.getElementById('osWindows').classList.toggle('active', systems.windows);
+            document.getElementById('osLinux').classList.toggle('active', systems.linux);
+            document.getElementById('osMac').classList.toggle('active', systems.mac);
 
-          const url = info && info.cover_url ? info.cover_url : '';
-          img.src = url || '';
-          img.style.display = url ? 'block' : 'none';
+            const desc = info.description_html || '<p>No description available.</p>';
+            document.getElementById('gameDescription').innerHTML = desc;
+        }
 
-          const d = document.createElement('div');
-          d.innerHTML = (info && info.description_html) ? info.description_html : '';
-          const txt = (d.textContent || d.innerText || '').trim();
-          desc.value = txt || 'No description.';
-        })
-        .catch(() => {
-          const img  = document.getElementById('gameCover');
-          const desc = document.getElementById('gameDesc');
-          img.src = '';
-          img.style.display = 'none';
-          desc.value = 'Brak danych.';
+        // Update form
+        document.getElementById('updateForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            fetch('/run_update', {method: 'POST', body: formData})
+                .then(r => r.json())
+                .then(data => {
+                    currentJobId = data.job_id;
+                    startPolling();
+                });
         });
-    }
 
-    document.addEventListener('DOMContentLoaded', ()=>{
-      resumeIfRunning();
-      fetchInfoForSelected();
-      document.getElementById('gameSelect')?.addEventListener('change', fetchInfoForSelected);
-    });
-  </script>
+        // Download selected
+        document.getElementById('downloadSelectedBtn').addEventListener('click', function() {
+            if (!selectedGameTitle) {
+                alert('Please select a game first');
+                return;
+            }
+            const form = document.getElementById('downloadForm');
+            const formData = new FormData(form);
+            fetch('/download_selected', {method: 'POST', body: formData})
+                .then(r => r.json())
+                .then(data => {
+                    if (data.error) {
+                        alert(data.error);
+                    } else {
+                        currentJobId = data.job_id;
+                        startPolling();
+                    }
+                });
+        });
+
+        // Download all
+        document.getElementById('downloadAllBtn').addEventListener('click', function() {
+            if (!confirm('Download all games? This may take a long time.')) return;
+            const form = document.getElementById('downloadForm');
+            const formData = new FormData(form);
+            fetch('/download_all', {method: 'POST', body: formData})
+                .then(r => r.json())
+                .then(data => {
+                    currentJobId = data.job_id;
+                    startPolling();
+                });
+        });
+
+        // Cancel job
+        document.getElementById('cancelBtn').addEventListener('click', function() {
+            if (!currentJobId) return;
+            fetch('/cancel_job', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body: 'job_id=' + currentJobId
+            }).then(r => r.json()).then(data => {
+                appendLog('[INFO] ' + data.message);
+            });
+        });
+
+        let pollInterval = null;
+
+        function startPolling() {
+            document.getElementById('cancelBtn').style.display = 'block';
+            if (pollInterval) clearInterval(pollInterval);
+            pollInterval = setInterval(pollJobStatus, 500);
+        }
+
+        function stopPolling() {
+            if (pollInterval) {
+                clearInterval(pollInterval);
+                pollInterval = null;
+            }
+            document.getElementById('cancelBtn').style.display = 'none';
+        }
+
+        function pollJobStatus() {
+            if (!currentJobId) return;
+            fetch('/job_status/' + currentJobId)
+                .then(r => r.json())
+                .then(data => {
+                    document.getElementById('logOutput').textContent = data.output || '';
+                    document.getElementById('logOutput').scrollTop = document.getElementById('logOutput').scrollHeight;
+                    
+                    if (data.status !== 'running') {
+                        stopPolling();
+                        document.getElementById('progressFill').style.width = '100%';
+                        document.getElementById('progressText').textContent = '100%';
+                        if (data.status === 'finished') {
+                            appendLog('\n[SUCCESS] Job completed successfully.');
+                            setTimeout(() => location.reload(), 1500);
+                        } else if (data.status === 'canceled') {
+                            appendLog('\n[CANCELED] Job was canceled.');
+                        } else {
+                            appendLog('\n[ERROR] Job failed with exit code ' + data.rc);
+                        }
+                    }
+                });
+        }
+
+        function appendLog(text) {
+            const log = document.getElementById('logOutput');
+            log.textContent += text + '\n';
+            log.scrollTop = log.scrollHeight;
+        }
+
+        // Poll for current job on page load
+        fetch('/current_job')
+            .then(r => r.json())
+            .then(data => {
+                if (data.job_id && data.status === 'running') {
+                    currentJobId = data.job_id;
+                    document.getElementById('logOutput').textContent = data.output || '';
+                    startPolling();
+                }
+            });
+    </script>
 </body>
 </html>
