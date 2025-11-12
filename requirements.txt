@@ -1,4 +1,6 @@
-Flask==3.0.0
-pexpect==4.9.0
-requests==2.32.3
-html5lib==1.1
+Flask
+requests
+pexpect
+beautifulsoup4
+html5lib
+lxml
