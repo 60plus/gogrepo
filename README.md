@@ -74,6 +74,7 @@ docker run -d --name gogrepo-gui \
   -v "$PWD/data:/app/data" \
   -e FLASK_SECRET_KEY="${FLASK_SECRET_KEY:-change-me}" \
   -e GOGREPO_DATA_DIR="/app/data" \
+  -e GOGREPO_DOWNLOAD_DIR="/app/data" \
   -e PYTHON_BIN="python3" \
   --restart unless-stopped \
   gogrepo-gui:latest
@@ -96,6 +97,7 @@ services:
     environment:
       - FLASK_SECRET_KEY=${FLASK_SECRET_KEY:-change-me}
       - GOGREPO_DATA_DIR=/app/data
+      - GOGREPO_DOWNLOAD_DIR=/app/data
       - PYTHON_BIN=python3
     volumes:
       - ./data:/app/data
@@ -119,6 +121,7 @@ docker run -d --name gogrepo-gui \
   -v "$PWD/data:/app/data" \
   -e FLASK_SECRET_KEY="${FLASK_SECRET_KEY:-change-me}" \
   -e GOGREPO_DATA_DIR="/app/data" \
+  -e GOGREPO_DOWNLOAD_DIR="/app/data" \
   -e PYTHON_BIN="python3" \
   --restart unless-stopped \
   60plus/gogrepo-gui:latest
@@ -138,6 +141,7 @@ services:
     environment:
       - FLASK_SECRET_KEY=${FLASK_SECRET_KEY:-change-me}
       - GOGREPO_DATA_DIR=/app/data
+      - GOGREPO_DOWNLOAD_DIR=/app/data
       - PYTHON_BIN=python3
     volumes:
       - ./data:/app/data
