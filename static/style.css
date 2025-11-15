@@ -78,6 +78,7 @@ body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  position: relative;
 }
 
 .game-item:hover {
@@ -89,6 +90,35 @@ body {
   background: var(--purple-primary);
   color: white;
   font-weight: 600;
+}
+
+/* Downloaded game styles */
+.game-item.downloaded {
+  background: linear-gradient(90deg, rgba(16, 185, 129, 0.15) 0%, transparent 100%);
+  border-left: 3px solid var(--success);
+  padding-left: 15px;
+}
+
+.game-item.downloaded:hover {
+  background: linear-gradient(90deg, rgba(16, 185, 129, 0.25) 0%, transparent 100%);
+  padding-left: 21px;
+}
+
+.game-item.downloaded.active {
+  background: var(--purple-primary);
+  border-left: 3px solid var(--success);
+}
+
+.downloaded-icon {
+  float: right;
+  color: var(--success);
+  font-size: 14px;
+  margin-left: 8px;
+  opacity: 0.9;
+}
+
+.game-item.active .downloaded-icon {
+  color: white;
 }
 
 .center-content {
