@@ -53,36 +53,45 @@
                         </div>
                     </div>
 
-                    <div class="info-section">
-                        <h3><i class="fas fa-building"></i> Developer & Publisher</h3>
-                        <p><strong>Developer:</strong> <span id="gameDeveloper">N/A</span></p>
-                        <p><strong>Publisher:</strong> <span id="gamePublisher">N/A</span></p>
-                    </div>
+                    <!-- Sekcje informacyjne - pełna szerokość z układem 3 w rzędzie -->
+                <div class="info-sections-wrapper">
+                    <!-- Górny rząd: 3 sekcje obok siebie -->
+                    <div class="info-row-top">
+                        <div class="info-section">
+                            <h3><i class="fas fa-building"></i> Developer & Publisher</h3>
+                            <p><strong>Developer:</strong> <span id="gameDeveloper">N/A</span></p>
+                            <p><strong>Publisher:</strong> <span id="gamePublisher">N/A</span></p>
+                        </div>
 
-                    <div class="info-section">
-                        <h3><i class="fas fa-language"></i> Languages</h3>
-                        <div class="lang-grid">
-                            <div><strong>Audio:</strong> <span id="langAudio">N/A</span></div>
-                            <div><strong>Text:</strong> <span id="langText">N/A</span></div>
-                            <div><strong>Subtitles:</strong> <span id="langSubtitles">N/A</span></div>
+                        <div class="info-section">
+                            <h3><i class="fas fa-language"></i> Languages</h3>
+                            <div class="lang-grid">
+                                <div><strong>Audio:</strong> <span id="langAudio">N/A</span></div>
+                                <div><strong>Text:</strong> <span id="langText">N/A</span></div>
+                                <div><strong>Subtitles:</strong> <span id="langSubtitles">N/A</span></div>
+                            </div>
+                        </div>
+
+                        <div class="info-section">
+                            <h3><i class="fas fa-laptop"></i> System Requirements</h3>
+                            <div class="os-icons">
+                                <i class="fab fa-windows os-icon" id="osWindows"></i>
+                                <i class="fab fa-linux os-icon" id="osLinux"></i>
+                                <i class="fab fa-apple os-icon" id="osMac"></i>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="info-section">
-                        <h3><i class="fas fa-laptop"></i> System Requirements</h3>
-                        <div class="os-icons">
-                            <i class="fab fa-windows os-icon" id="osWindows"></i>
-                            <i class="fab fa-linux os-icon" id="osLinux"></i>
-                            <i class="fab fa-apple os-icon" id="osMac"></i>
+                    <!-- Dolny rząd: Description wypełnia całą szerokość -->
+                    <div class="info-row-bottom">
+                        <div class="info-section info-section-full">
+                            <h3><i class="fas fa-align-left"></i> Description</h3>
+                            <div class="game-description" id="gameDescription">
+                                <p>No description available.</p>
+                            </div>
                         </div>
                     </div>
-
-                    <div class="info-section">
-                        <h3><i class="fas fa-align-left"></i> Description</h3>
-                        <div class="game-description" id="gameDescription">
-                            <p>No description available.</p>
-                        </div>
-                    </div>
+                </div>
                 </div>
             </div>
         </div>
